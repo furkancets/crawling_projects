@@ -1,8 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium import webdriver
 import pandas as pd
+from config_url import URLLIST
 
 sess = requests.Session()
 
@@ -11,7 +10,7 @@ lst = [i for i in range(1, 7)]
 x = []
 
 for i in lst:
-    url = "https://www.dermokozmetika.com.tr/hediye-setleri?pg=" + str(i)
+    url = URLLIST.crawler_two_one_url + str(i)
 
     res = sess.get(url)
 
@@ -105,4 +104,4 @@ for i in lst:
 
         df = pd.DataFrame(x)
 
-        df.to_excel('dermokozmetika_hediye_setleri.xlsx', index=False)
+        df.to_excel('dermo.xlsx', index=False)

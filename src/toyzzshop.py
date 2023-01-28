@@ -1,16 +1,11 @@
-import urllib3
 import requests
 from bs4 import BeautifulSoup
-from urllib.request import urlopen
-import re
-from csv import writer
-import csv
-from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import warnings
 warnings.filterwarnings(action='ignore')
+from config_url import URLLIST
 
 sess = requests.Session()
 
@@ -19,17 +14,16 @@ lst = [i for i in range(1, 59)] #76 page
 x = []
 
 for n in lst:
-    url = 'https://www.toyzzshop.com/yapim-oyuncaklari-lego?q=/page/' + str(n)
+    url = URLLIST.crawler_sixth_one_url + str(n)
     print(url)
     browser = webdriver.Chrome(ChromeDriverManager().install())
     browser.get(url)
     html = browser.page_source
     soup = BeautifulSoup(html, 'html.parser')
-    #print(soup.prettify())
 
     # Grab only the main content part of the page
     main_page = soup.find('div', {'class': 'masonry-grid'})
-    #print(main_page)
+
 
 
     main_page_for_link = main_page.find_all('a', class_='toy-title fs-18', href=True)
@@ -40,8 +34,8 @@ for n in lst:
         pr_link = pr_partial_link
         print(pr_link)
 
-        detail = sess.get("https://www.toyzzshop.com" + str(pr_link))
-        product_url = "https://www.toyzzshop.com" + str(pr_link)
+        detail = sess.get(URLLIST.crawler_sixth_two_url + str(pr_link))
+        product_url = URLLIST.crawler_sixth_two_url + str(pr_link)
         print(product_url)
         soup_detail = BeautifulSoup(detail.text, 'html.parser')
 
@@ -90,17 +84,17 @@ for n in lst:
             product_age_range = None
             product_origin = None
 
-        pc1 = soup_detail.find_all("a" , class_='fs-14')
+        pc1 = soup_detail.find_all("a", class_='fs-14')
         if pc1 is not None:
             pc1 = pc1[1].get_text()
             product_main_category = pc1
             print(product_main_category)
-        pc2 = soup_detail.find_all("a" , class_='fs-14')
+        pc2 = soup_detail.find_all("a", class_='fs-14')
         if pc2 is not None:
             pc2 = pc2[2].get_text()
             product_category = pc2
             print(product_category)
-        pc3 = soup_detail.find_all("a" , class_='fs-14')
+        pc3 = soup_detail.find_all("a", class_='fs-14')
         if pc3 is not None:
             pc3 = pc3[3].get_text()
             product_subcategory = pc3
@@ -122,21 +116,6 @@ for n in lst:
             product_picture = str_image
             print(product_picture)
 
-
-        '''
-        print('product_link: ', pr_link) okey
-        print('product_brand: ', product_brand) okey
-        print('product_name: ', product_name) okey 
-        print('product_barcode: ', product_barcode.text) okey
-        print('product_main_category: ', product_main_category) okey
-        print('product_category: ', product_category) okey
-        print('product_subcategory', product_subcategory) okey
-        print('product_picture: ', product_picture) okey
-        print('product_short_info: ', product_short_info) yok
-        print('product_long_info: ', product_long_info) okey
-        print('product_label: ', product_label) yok
-        '''
-
         x.append({  'url': url,
                     'product_url': product_url,
                     'product_brand': product_brand,
@@ -151,12 +130,4 @@ for n in lst:
 
         df = pd.DataFrame(x)
 
-        df.to_excel('toyzzshop_oyuncak_yapim_oyuncaklari.xlsx', index=False)
-
-        #file = open('vitaminler_denemelerrrr.csv', 'w', newline='', encoding='utf-8')
-        #writer = csv.writer(file)
-        #headers = ([url, pr_link, product_brand, product_name,
-        #            product_main_category, product_category, product_subcategory, product_picture,
-        #            product_long_info, product_label])
-        #writer.writerow(headers)
-        #file.close()m
+        df.to_excel('toyzshop.xlsx', index=False)

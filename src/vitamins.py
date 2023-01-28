@@ -1,20 +1,16 @@
-import urllib3
 import requests
 from bs4 import BeautifulSoup
-from urllib.request import urlopen
-import re
-from csv import writer
-import csv
 import pandas as pd
+from config_url import URLLIST
 
 sess = requests.Session()
 
-lst = [i for i in range(1,6)] #7 page
+lst = [i for i in range(1, 6)] #7 page
 
 x = []
 
 for n in lst:
-    url = 'https://www.vitaminler.com/c/diger-takviyeler-74?pagenumber=' + str(n)
+    url = URLLIST.crawler_seventh_one_url + str(n)
     res = sess.get(url)
     soup = BeautifulSoup(res.text, 'lxml')
     #print(soup.prettify())
@@ -43,11 +39,6 @@ for n in lst:
             product_name = product_name_1.next_element
             print(product_name)
 
-        #product_barcode_1 = soup_detail.find(class_='fr col chbarcode')
-        #if product_barcode_1 is not None:
-            # product_barcode = product_barcode_1.next_element
-            # print(product_barcode)
-
         pc1 = soup_detail.find(class_='catalog_path path', recursive=True)
         if pc1 is not None:
             pc2 = pc1.text
@@ -74,20 +65,6 @@ for n in lst:
         product_label = ''.join(product_label)
         print(product_label)
 
-        '''
-        print('product_link: ', pr_link) okey
-        print('product_brand: ', product_brand) okey
-        print('product_name: ', product_name) okey 
-        print('product_barcode: ', product_barcode.text) yok
-        print('product_main_category: ', product_main_category) okey
-        print('product_category: ', product_category) okey
-        print('product_subcategory', product_subcategory) okey
-        print('product_picture: ', product_picture) okey
-        print('product_short_info: ', product_short_info) yok
-        print('product_long_info: ', product_long_info) okey
-        print('product_label: ', product_label) okey
-        '''
-
         x.append({'url': url,
                     'pr_link': pr_link,
                     'product_brand': product_brand,
@@ -101,12 +78,4 @@ for n in lst:
 
         df = pd.DataFrame(x)
 
-        df.to_excel('vitaminler_Diğer_Takviyeler.xlsx', index=False)
-
-        #file = open('vitaminler_denemelerrrr.csv', 'w', newline='', encoding='utf-8')
-        #writer = csv.writer(file)
-        #headers = ([url, pr_link, product_brand, product_name,
-        #            product_main_category, product_category, product_subcategory, product_picture,
-        #            product_long_info, product_label])
-        #writer.writerow(headers)
-        #file.close()m
+        df.to_excel('vitamins.xlsx', index=False)
